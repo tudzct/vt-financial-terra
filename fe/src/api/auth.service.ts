@@ -7,11 +7,25 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  full_name: string
+  fullName: string
   email: string
-  username: string
   password: string
-  phone_number?: string
+  confirmPassword: string
+}
+
+export interface RegisteredUser {
+  id: number
+  fullName: string
+  email: string
+}
+
+export interface RegisterResponse {
+  success: boolean
+  message: string
+  data?: {
+    accessToken: string
+    user: RegisteredUser
+  }
 }
 
 export const authService = {
@@ -22,7 +36,7 @@ export const authService = {
   },
 
   // Đăng ký
-  register: async (data: RegisterRequest): Promise<ApiResponse<User>> => {
+  register: async (data: RegisterRequest): Promise<RegisterResponse> => {
     const response = await axiosInstance.post('/auth/register', data)
     return response.data
   },
