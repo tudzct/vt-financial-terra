@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { isEmail } from 'class-validator';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { User } from '../user/user.entity';
+import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
 type RegistrationErrorField =
@@ -24,9 +26,27 @@ interface NormalizedRegistration {
   password: string;
 }
 
+interface NormalizedLogin {
+  email: string;
+  password: string;
+}
+
 export interface RegisterResponse {
   success: true;
   message: 'Registration successful';
+  data: {
+    accessToken: string;
+    user: {
+      id: number;
+      fullName: string;
+      email: string;
+    };
+  };
+}
+
+export interface LoginResponse {
+  success: true;
+  message: 'Successful Login';
   data: {
     accessToken: string;
     user: {
@@ -154,6 +174,72 @@ export class AuthService {
     });
   }
 
+  async login(dto: LoginDto): Promise<LoginResponse> {
+    // BR-LOG-01 and BR-LOG-02: normalize and validate before database access.
+    const login = this.normalizeAndValidateLogin(dto);
+
+    try {
+      // BR-LOG-03 and BR-LOG-04: lookup uses the normalized address and only
+      // selects fields needed for credential verification and the response.
+      const user = await this.userRepository
+        .createQueryBuilder('user')
+        .select(['user.userId', 'user.fullName', 'user.email', 'user.password'])
+        .where('LOWER(TRIM(user.email)) = :email', { email: login.email })
+        .getOne();
+
+      // BR-LOG-05: do not distinguish an absent account from a bad password.
+      if (!user || !(await bcrypt.compare(login.password, user.password))) {
+        this.throwInvalidCredentials();
+      }
+
+      // BR-LOG-06: signing happens only after successful verification. Login is
+      // read-only, so it has no persistence transaction or idempotency state.
+      const accessToken = await this.jwtService.signAsync({
+        sub: user.userId,
+        email: user.email,
+      });
+
+      return {
+        success: true,
+        message: 'Successful Login',
+        data: {
+          accessToken,
+          user: {
+            id: user.userId,
+            fullName: user.fullName,
+            email: user.email,
+          },
+        },
+      };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Internal Server Error',
+      });
+    }
+  }
+
+  private normalizeAndValidateLogin(dto: LoginDto): NormalizedLogin {
+    if (typeof dto?.email !== 'string') {
+      this.throwLoginBadRequest('email', 'Email address is required.');
+    }
+
+    const email = dto.email.trim().toLowerCase();
+    if (email.length === 0 || !this.isEmail(email)) {
+      this.throwLoginBadRequest('email', 'Enter a valid email address.');
+    }
+
+    if (typeof dto?.password !== 'string' || dto.password.length === 0) {
+      this.throwLoginBadRequest('password', 'Password is required.');
+    }
+
+    return { email, password: dto.password };
+  }
+
   private normalizeAndValidate(dto: RegisterDto): NormalizedRegistration {
     if (typeof dto?.fullName !== 'string') {
       this.throwBadRequest('fullName', 'Name is required.');
@@ -255,6 +341,17 @@ export class AuthService {
 
   private throwBadRequest(field: RegistrationErrorField, message: string): never {
     throw new BadRequestException({ success: false, message, error: field });
+  }
+
+  private throwLoginBadRequest(field: 'email' | 'password', message: string): never {
+    throw new BadRequestException({ success: false, message, error: field });
+  }
+
+  private throwInvalidCredentials(): never {
+    throw new UnauthorizedException({
+      success: false,
+      message: 'Email or password is incorrect.',
+    });
   }
 
   private throwConflict(): never {

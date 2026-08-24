@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (username: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<void>
   logout: () => void
   updateUser: (userData: User) => void
 }
@@ -36,12 +36,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(false)
   }, [])
 
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
     try {
-      const response = await authService.login({ username, password })
+      const response = await authService.login({ email: email.trim().toLowerCase(), password })
       if (response.success && response.data) {
-        const { user: userData, token } = response.data
-        localStorage.setItem('token', token)
+        const userData: User = {
+          user_id: response.data.user.id,
+          full_name: response.data.user.fullName,
+          email: response.data.user.email,
+          username: '',
+          total_balance: 0,
+        }
+        localStorage.setItem('token', response.data.accessToken)
         localStorage.setItem('user', JSON.stringify(userData))
         setUser(userData)
       } else {
@@ -85,4 +91,3 @@ export const useAuth = () => {
   }
   return context
 }
-
