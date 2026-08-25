@@ -1,7 +1,13 @@
 import axiosInstance from './axiosInstance'
-import { ApiResponse, Account } from './types'
+import { ApiResponse, Account, AccountListData } from './types'
 
 export const accountService = {
+  // Lấy danh sách tài khoản an toàn theo người dùng trong JWT
+  getAccountList: async (): Promise<ApiResponse<AccountListData>> => {
+    const response = await axiosInstance.get('/v1/accounts')
+    return response.data
+  },
+
   // Lấy danh sách tài khoản của user
   getAccounts: async (): Promise<ApiResponse<Account[]>> => {
     const response = await axiosInstance.get('/accounts')

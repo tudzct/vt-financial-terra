@@ -27,6 +27,22 @@ export interface Account {
   balance: number
 }
 
+/** Defines the safe account fields returned by the account-list endpoint. */
+export interface AccountListItem {
+  id: number
+  bank_name: string
+  account_type: Account['account_type']
+  branch_name: string | null
+  account_number_last_4: string
+  balance: number
+}
+
+/** Defines the account-list response data returned for the authenticated user. */
+export interface AccountListData {
+  user_id: number
+  accounts: AccountListItem[]
+}
+
 export interface Category {
   category_id: number
   category_name: string

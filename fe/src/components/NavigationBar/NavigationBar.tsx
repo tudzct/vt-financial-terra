@@ -5,7 +5,7 @@ const NavigationBar: React.FC = () => {
   const navItems = [
     { path: '/bills', label: 'Hóa đơn', icon: '📄' },
     { path: '/transactions', label: 'Giao dịch', icon: '💳' },
-    { path: '/account', label: 'Tài khoản', icon: '🏦' },
+    { path: '/accounts', label: 'Tài khoản', icon: '🏦' },
     { path: '/goals', label: 'Mục tiêu', icon: '🎯' },
     { path: '/expenses', label: 'Chi tiêu', icon: '💰' },
   ]

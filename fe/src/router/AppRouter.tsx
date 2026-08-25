@@ -64,13 +64,14 @@ const AppRouter: React.FC = () => {
               }
             />
             <Route
-              path="/account"
+              path="/accounts"
               element={
                 <ProtectedRoute>
                   <Account />
                 </ProtectedRoute>
               }
             />
+            <Route path="/account" element={<Navigate to="/accounts" replace />} />
             <Route
               path="/goals"
               element={

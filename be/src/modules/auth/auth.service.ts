@@ -225,7 +225,10 @@ export class AuthService {
 
     return this.jwtService.signAsync(
       { sub: user.userId, email: user.email },
-      { secret: jwtSecret },
+      {
+        secret: jwtSecret,
+        expiresIn: '1h',
+      },
     );
   }
 
