@@ -7,6 +7,7 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Unique,
 } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Transaction } from '../transaction/transaction.entity';
@@ -20,6 +21,7 @@ export enum AccountType {
 }
 
 @Entity('Accounts')
+@Unique('UQ_accounts_user_id_account_number_full', ['userId', 'accountNumberFull'])
 export class Account {
   @PrimaryGeneratedColumn({ name: 'account_id' })
   accountId: number;

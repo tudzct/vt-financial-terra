@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import NavigationBar from '../NavigationBar/NavigationBar'
+import BalancesLayout from '../BalancesLayout/BalancesLayout'
 
 interface LayoutProps {
   children: ReactNode
@@ -21,6 +22,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   if (location.pathname === '/login' || location.pathname === '/register') {
     return <>{children}</>
+  }
+
+  if (location.pathname === '/accounts') {
+    return <BalancesLayout>{children}</BalancesLayout>
   }
 
   if (location.pathname === '/transactions') {

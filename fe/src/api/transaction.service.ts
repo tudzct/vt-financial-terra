@@ -1,5 +1,11 @@
 import axiosInstance from './axiosInstance'
-import { ApiResponse, Transaction, TransactionListResponse } from './types'
+import {
+  ApiResponse,
+  CreatedTransaction,
+  CreateTransactionPayload,
+  Transaction,
+  TransactionListResponse,
+} from './types'
 
 export const transactionService = {
   // Lấy một trang lịch sử giao dịch thuộc người dùng hiện tại.
@@ -33,6 +39,14 @@ export const transactionService = {
   // Tạo giao dịch mới
   createTransaction: async (data: Omit<Transaction, 'transaction_id'>): Promise<ApiResponse<Transaction>> => {
     const response = await axiosInstance.post('/transactions', data)
+    return response.data
+  },
+
+  /** Creates a transaction using the protected UC-04 endpoint. */
+  createTransactionForCurrentUser: async (
+    data: CreateTransactionPayload,
+  ): Promise<ApiResponse<CreatedTransaction>> => {
+    const response = await axiosInstance.post('/v1/transactions', data)
     return response.data
   },
 

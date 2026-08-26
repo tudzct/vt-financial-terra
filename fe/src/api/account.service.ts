@@ -1,5 +1,5 @@
 import axiosInstance from './axiosInstance'
-import { ApiResponse, Account } from './types'
+import { ApiResponse, Account, CreateAccountPayload, CreatedAccount } from './types'
 
 export const accountService = {
   // Lấy danh sách tài khoản của user
@@ -15,7 +15,8 @@ export const accountService = {
   },
 
   // Tạo tài khoản mới
-  createAccount: async (data: Omit<Account, 'account_id'>): Promise<ApiResponse<Account>> => {
+  /** Creates one owned account using API-ACCOUNT-CREATE. */
+  createAccount: async (data: CreateAccountPayload): Promise<ApiResponse<{ account: CreatedAccount }>> => {
     const response = await axiosInstance.post('/accounts', data)
     return response.data
   },

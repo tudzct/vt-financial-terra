@@ -27,6 +27,26 @@ export interface Account {
   balance: number
 }
 
+/** Payload accepted by the protected API-ACCOUNT-CREATE endpoint. */
+export interface CreateAccountPayload {
+  bank_name: string
+  account_type: Account['account_type']
+  branch_name?: string
+  account_number_full: string
+  balance: number
+}
+
+/** Safe account fields returned after a successful account creation. */
+export interface CreatedAccount {
+  id: number
+  user_id: number
+  bank_name: string
+  account_type: Account['account_type']
+  branch_name: string | null
+  account_number_last_4: string
+  balance: number
+}
+
 export interface Category {
   category_id: number
   category_name: string
@@ -44,6 +64,35 @@ export interface Transaction {
   status: 'Complete' | 'Pending' | 'Failed'
   receipt_id?: string
   category_id?: number
+}
+
+/** Request payload accepted by API-TRANSACTION-CREATE. */
+export interface CreateTransactionPayload {
+  accountId: number
+  transactionDate: string
+  type: 'Revenue' | 'Expense'
+  itemDescription: string
+  category_id: number | null
+  shopName: string
+  amount: number
+  paymentMethod: string
+  status: 'Complete' | 'Pending' | 'Failed'
+}
+
+/** Response data returned after a transaction and balance are committed. */
+export interface CreatedTransaction {
+  transactionId: number
+  accountId: number
+  transactionDate: string
+  type: 'Revenue' | 'Expense'
+  itemDescription: string
+  shopName: string
+  amount: number
+  paymentMethod: string
+  status: 'Complete' | 'Pending' | 'Failed'
+  receiptId: null
+  createdAt: string
+  category_id: number | null
 }
 
 export interface TransactionListResponse {

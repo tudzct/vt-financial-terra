@@ -69,10 +69,10 @@ export class Transaction {
   status: TransactionStatus;
 
   @Column({ name: 'receipt_id', type: 'varchar', length: 255, nullable: true })
-  receiptId: string;
+  receiptId: string | null;
 
   @Column({ name: 'category_id', type: 'int', nullable: true })
-  categoryId: number;
+  categoryId: number | null;
 
   @ManyToOne(() => Category, (category) => category.transactions, {
     nullable: true,

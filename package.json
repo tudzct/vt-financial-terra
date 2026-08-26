@@ -1,0 +1,15 @@
+{
+  "name": "vt-financial-terra",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Financial Management Platform",
+  "scripts": {
+    "test": "npm run test:all --prefix be",
+    "test:all": "npm run test:all --prefix be",
+    "test:flow": "npm run test:flow --prefix be",
+    "test:account": "npm run test:account --prefix be",
+    "test:unit": "npm run test:unit --prefix be",
+    "test:e2e": "npm run test:e2e --prefix be",
+    "test:cov": "npm run test:cov --prefix be"
+  }
+}

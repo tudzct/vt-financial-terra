@@ -1,7 +1,8 @@
-import { Controller, Get, Query, Req, UseGuards, Post } from '@nestjs/common';
+import { Body, Controller, Get, Query, Req, UseGuards, Post } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { TransactionListQueryDto } from './dto/transaction-list-query.dto';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionService } from './transaction.service';
 
 interface AuthenticatedRequest extends Request {
@@ -21,6 +22,15 @@ export class TransactionController {
     @Query() query: TransactionListQueryDto,
   ) {
     return this.transactionService.findAllByUserId(request.user.userId, query);
+  }
+
+  /** Creates one transaction and atomically applies its account-balance change. */
+  @Post()
+  create(
+    @Req() request: AuthenticatedRequest,
+    @Body() createTransactionDto: CreateTransactionDto,
+  ) {
+    return this.transactionService.create(request.user.userId, createTransactionDto);
   }
 
   @Post('seed')

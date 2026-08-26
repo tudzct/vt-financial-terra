@@ -3,6 +3,7 @@ import { AxiosError } from 'axios'
 import { transactionService } from '../../api/transaction.service'
 import { Transaction } from '../../api/types'
 import Loading from '../../components/Loading/Loading'
+import AddTransactionForm from '../../components/AddTransactionForm/AddTransactionForm'
 
 type FilterType = 'All' | 'Revenue' | 'Expense'
 
@@ -23,6 +24,7 @@ const Transactions: React.FC = () => {
   const [hasMore, setHasMore] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isAddingTransaction, setIsAddingTransaction] = useState(false)
   const requestIdRef = useRef(0)
 
   /** Requests one validated transaction page and preserves stable list state. */
@@ -77,6 +79,10 @@ const Transactions: React.FC = () => {
     if (!isLoading && hasMore) void fetchTransactions(offset, false)
   }
 
+  if (isAddingTransaction) {
+    return <AddTransactionForm onCancel={() => setIsAddingTransaction(false)} />
+  }
+
   return (
     <section className="relative">
       {error && (
@@ -88,7 +94,17 @@ const Transactions: React.FC = () => {
         </div>
       )}
 
-      <h1 className="text-2xl font-normal text-[#8b8b8b]">Recent Transaction</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-normal text-[#8b8b8b]">Recent Transaction</h1>
+        <button
+          type="button"
+          onClick={() => setIsAddingTransaction(true)}
+          className="flex h-[46px] items-center gap-2 rounded bg-[#2fa096] px-5 text-sm font-semibold text-white transition hover:bg-[#278d84]"
+        >
+          <span className="text-lg leading-none" aria-hidden="true">+</span>
+          Add Transaction
+        </button>
+      </div>
       <div className="mt-4 flex h-9 items-start gap-8" role="tablist" aria-label="Transaction type">
         {filters.map((filter) => (
           <button

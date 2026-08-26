@@ -14,12 +14,18 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "jest --config ./jest-all.json",
+    "test:all": "jest --config ./jest-all.json",
+    "test:unit": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test:cov": "jest --config ./jest-all.json --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "seed": "ts-node -r tsconfig-paths/register src/database/seed.ts"
+    "test:flow": "jest test/add-transaction-full-flow.e2e-spec.ts",
+    "test:account": "jest test/add-account-full-flow.e2e-spec.ts",
+    "seed": "ts-node -r tsconfig-paths/register src/database/seed.ts",
+    "migration:run": "typeorm-ts-node-commonjs -d src/config/data-source.ts migration:run",
+    "migration:revert": "typeorm-ts-node-commonjs -d src/config/data-source.ts migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
